@@ -36,17 +36,46 @@ You'll also need:
 
 ## Install on Windows (typical deployment)
 
-You have two paths. Pick one.
+You have three paths. Pick whichever fits.
 
-### Path A — Build directly on the target server (simplest)
+### Path A — Download the prebuilt `.exe` from Releases (recommended for locked-down servers)
 
-If the target server already has internet access and you're OK installing Python on it (e.g. a tools host or a dedicated admin VM), do the whole thing in place:
+GitHub Actions builds `bwexport.exe` on every tagged release. The server needs **only the bw CLI and `bwexport.exe`** — no Python, no Git, no build tooling.
+
+1. **Install the Bitwarden CLI** on the server (winget isn't on most Server SKUs, so use a direct install):
+
+    Either download the zip from <https://bitwarden.com/download/> ("Command line" → Windows) and put `bw.exe` on PATH, or paste this in PowerShell as Administrator:
+
+    ```powershell
+    $dest = "C:\Tools\bw"
+    $zip  = "$env:TEMP\bw-cli.zip"
+    New-Item -ItemType Directory -Force -Path $dest | Out-Null
+    Invoke-WebRequest -Uri "https://vault.bitwarden.com/download/?app=cli&platform=windows" -OutFile $zip
+    Expand-Archive -Path $zip -DestinationPath $dest -Force
+    Remove-Item $zip
+    [Environment]::SetEnvironmentVariable(
+        "Path",
+        [Environment]::GetEnvironmentVariable("Path","Machine") + ";$dest",
+        "Machine"
+    )
+    ```
+
+2. **Download `bwexport.exe`** from the latest release: <https://github.com/shuckyd/bwexport/releases/latest>. Save it to `C:\Tools\bwexport.exe` (or anywhere convenient).
+
+3. **Run it.** Double-click `bwexport.exe`.
+
+That's the entire deployment. To update later, download the new `.exe` over the old one.
+
+### Path B — Build directly on the target machine
+
+If the target machine has Python and you'd rather build from source than wait on CI:
 
 ```powershell
-# 1. Install dependencies (one-time)
+# 1. Install dependencies
 winget install Git.Git
 winget install Python.Python.3.12
 winget install Bitwarden.CLI
+# (or use the direct-download equivalents if winget isn't available)
 
 # 2. Clone and build
 git clone https://github.com/shuckyd/bwexport.git C:\Tools\bwexport
@@ -57,38 +86,25 @@ cd C:\Tools\bwexport
 .\dist\bwexport.exe
 ```
 
-`bwexport.exe` is the only file you need to keep around — pin it to the taskbar or drop a shortcut on the desktop.
+### Path C — Build on a workstation, copy `.exe` to the server
 
-### Path B — Build on a workstation, copy `.exe` to the server
-
-If the target server is locked down (no Python, no winget, restricted internet), build elsewhere and copy:
-
-```powershell
-# On a Windows workstation with Python:
-git clone https://github.com/shuckyd/bwexport.git
-cd bwexport
-.\build_windows.ps1
-# → dist\bwexport.exe is produced
-
-# Then on the target server:
-winget install Bitwarden.CLI       # bw CLI is still required at runtime
-# Copy dist\bwexport.exe to the server (file share, USB, RDP clipboard, etc.)
-# Run it.
-```
-
-The target server only needs **`bw.exe` on PATH** and the `.exe`. No Python, no Git.
+Same as Path B, but build on a Windows workstation and copy `dist\bwexport.exe` to the server (file share, USB, RDP clipboard). The server still needs the bw CLI from step 1 of Path A.
 
 ---
 
 ## Updating to a newer version
 
-```powershell
-cd C:\Tools\bwexport
-git pull
-.\build_windows.ps1
+- **Path A (download .exe):** grab the new `bwexport.exe` from <https://github.com/shuckyd/bwexport/releases/latest> and overwrite the old one.
+- **Path B/C (build from source):** `git pull` and re-run `.\build_windows.ps1`.
+
+To cut a new release that CI will build automatically:
+
+```bash
+git tag v0.1.1
+git push --tags
 ```
 
-Or, for Path B deployments, rebuild on your workstation and copy the new `dist\bwexport.exe` over the old one.
+The `Build Windows EXE` workflow (`.github/workflows/build.yml`) builds the exe and attaches it to a release with that tag.
 
 ---
 
