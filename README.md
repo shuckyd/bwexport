@@ -60,9 +60,15 @@ GitHub Actions builds `bwexport.exe` on every tagged release. The server needs *
     )
     ```
 
-2. **Download `bwexport.exe`** from the latest release: <https://github.com/shuckyd/bwexport/releases/latest>. Save it to `C:\Tools\bwexport.exe` (or anywhere convenient).
+2. **Download `bwexport.exe`** from the latest release. Either visit <https://github.com/shuckyd/bwexport/releases/latest> in a browser, or pull it directly with PowerShell:
 
-3. **Run it.** Double-click `bwexport.exe`.
+    ```powershell
+    Invoke-WebRequest `
+      -Uri "https://github.com/shuckyd/bwexport/releases/latest/download/bwexport.exe" `
+      -OutFile "C:\Tools\bwexport.exe"
+    ```
+
+3. **Run it.** Double-click `C:\Tools\bwexport.exe`.
 
 That's the entire deployment. To update later, download the new `.exe` over the old one.
 
