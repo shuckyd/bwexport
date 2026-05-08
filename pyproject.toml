@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bwexport"
+version = "0.1.0"
+description = "Per-collection password export for self-hosted Bitwarden organizations."
+requires-python = ">=3.10"
+dependencies = [
+    "keyring>=24",
+    'pywin32>=306; sys_platform == "win32"',
+]
+
+[project.scripts]
+bwexport = "bwexport.cli:main"
+
+[project.gui-scripts]
+bwexport-gui = "bwexport.gui:main"
+
+[tool.setuptools.packages.find]
+include = ["bwexport*"]
