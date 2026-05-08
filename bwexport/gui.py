@@ -1,8 +1,7 @@
-"""Tkinter GUI for Bitwarden per-collection export.
+"""Tkinter GUI for bwexport.
 
-Designed to run on Windows (the typical MSP deployment target). Built for the
-client-handover workflow: pick a collection, get a Bitwarden-compatible CSV
-the client can re-import elsewhere.
+Designed to run on Windows. Lets a user pick a single collection from a
+Bitwarden organization and export it as a Bitwarden-compatible CSV.
 
 Security model is identical to the CLI sibling (see bwexport.core): API key in
 the OS credential store, master password interactive every unlock, BW_SESSION
@@ -401,7 +400,8 @@ class App(tk.Tk):
                 "Export complete",
                 f"Wrote {n} item(s) to:\n{path}\n\n"
                 "Reminder: this CSV contains plaintext passwords. "
-                "Encrypt before transmission and shred after handover.",
+                "Encrypt before transmission and delete the file securely once "
+                "it has served its purpose.",
                 parent=self,
             )
 

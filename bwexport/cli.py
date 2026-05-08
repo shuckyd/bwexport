@@ -80,7 +80,7 @@ def main():
     sys.stderr.write(
         f"Exported {len(items)} item(s) from collection '{col['name']}' to {args.out}.\n"
         f"Reminder: this CSV contains plaintext passwords. Encrypt before transmission and "
-        f"shred after handover.\n"
+        f"delete the file securely once it has served its purpose.\n"
     )
 
 
